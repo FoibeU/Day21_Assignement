@@ -1,10 +1,16 @@
 public class BankAccount {
+
 private String accountName;
 private String accountHolder;
-private  Double balance;
+private double balance;
 
+// Constructor for creating an account with an initial balance
+public BankAccount(double balance) {
+	this.balance = balance;
+}
 
-public BankAccount(String accountName, String accountHolder, Double balance) {
+// Constructor for creating an account with account details
+public BankAccount(String accountName, String accountHolder, double balance) {
 	this.accountName = accountName;
 	this.accountHolder = accountHolder;
 	this.balance = balance;
@@ -26,29 +32,49 @@ public void setAccountHolder(String accountHolder) {
 	this.accountHolder = accountHolder;
 }
 
-public Double getBalance() {
+public synchronized double getBalance() {
 	return balance;
 }
 
-public void setBalance(Double balance) {
+public synchronized void setBalance(double balance) {
+	if (balance < 0) {
+		throw new IllegalArgumentException("Balance cannot be negative.");
+	}
 	this.balance = balance;
 }
-public Double deposit(double amount){
-	if(amount <= 0){
-		System.out.println("Invalid balance");
-	}else{
-		balance+=amount;
+
+// Deposit money into the account
+public synchronized double deposit(double amount) {
+	if (amount <= 0) {
+		System.out.println("Invalid deposit amount.");
+		return balance;
 	}
 	
-	return balance+amount;
-	
-}
-public Double withdraw(Double amount){
-	if (amount > balance||balance <= 0){
-		System.out.println("You have Insuffient balance");
-	}else{
-	balance-=amount;
-	}return balance - amount;
+	balance += amount;
+	return balance;
 }
 
+// Withdraw money only when enough money is available
+public synchronized boolean withdraw(double amount) {
+	if (amount <= 0) {
+		System.out.println("Invalid withdrawal amount.");
+		return false;
+	}
+	
+	if (balance < amount) {
+		return false;
+	}
+	
+	balance -= amount;
+	return true;
+}
+
+@Override
+public String toString() {
+	return "BankAccount{" +
+			       "accountName='" + accountName + '\'' +
+			       ", accountHolder='" + accountHolder + '\'' +
+			       ", balance=" + getBalance() +
+			       '}';
+}
 }
